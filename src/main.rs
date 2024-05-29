@@ -4,30 +4,19 @@ mod common;
 mod data;
 
 use percent_encoding::utf8_percent_encode;
-use std::io::Cursor;
 
 use common::HopType;
-use rocket::{
-    get,
-    http::ContentType,
-    response::{self, Redirect},
-    routes, Response,
-};
+use rocket::response::{content::RawHtml, Redirect};
+use rocket::{get, launch, routes};
 
 #[get("/opensearch.xml")]
-fn opensearch_file<'r>() -> Response<'r> {
-    Response::build()
-        .header(ContentType::new("application", "opensearchdescription+xml"))
-        .sized_body(Cursor::new(include_str!("opensearch.xml")))
-        .finalize()
+fn opensearch_file() -> &'static str {
+    include_str!("opensearch.xml")
 }
 
 #[get("/")]
-fn index<'a>() -> response::Result<'a> {
-    Response::build()
-        .header(ContentType::HTML)
-        .sized_body(Cursor::new(&*data::HELP_PAGE))
-        .ok()
+fn index<'a>() -> RawHtml<&'static str> {
+    RawHtml(data::HELP_PAGE.as_str())
 }
 
 #[get("/info/healthcheck")]
@@ -48,8 +37,7 @@ fn search(args: String) -> Redirect {
     }
 }
 
-fn main() {
-    rocket::ignite()
-        .mount("/", routes![index, search, opensearch_file, healthcheck])
-        .launch();
+#[launch]
+fn rocket() -> _ {
+    rocket::build().mount("/", routes![index, search, opensearch_file, healthcheck])
 }
