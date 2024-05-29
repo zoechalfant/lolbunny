@@ -1,16 +1,13 @@
 use super::common::HopType;
-use phf::{self, phf_map, phf_set};
+use phf::{self, phf_map};
 
 type UrlEntry = (&'static str, HopType, &'static str);
 
-pub static SRCGRAPH_FLAGS: phf::Set<&str> = phf_set! {
-    "re",
-    "rec",
-    "sl",
-    "slc",
-    "st",
-    "stc",
+pub static DASH_MAP: phf::Map<&str, &str> = phf_map! {
+    "ids" => "9bk-z3t-ikj/identity-service-slo-dashboard",
+    "passp" => "xzb-gkq-rst/passport-webapp-slo-dashboard",
 };
+
 // nobody wants each item in its own 4 line block
 #[rustfmt::skip]
 pub static URLDATA: &[UrlEntry] = &[
@@ -23,7 +20,7 @@ pub static URLDATA: &[UrlEntry] = &[
 
     // complex workflows
     //   create and handle a custom HopType if the workflow depends on its arguments
-    ("dash", HopType::Dashboard("https://app.datadoghq.com/"), "Go to or search for dashboard"),
+    ("dash", HopType::Dashboard("https://app.datadoghq.com/"), "Go to or search for dashboard, e.g. `dash yourdashboardname`"),
 
 ];
 
