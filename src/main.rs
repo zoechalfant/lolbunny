@@ -24,9 +24,10 @@ fn healthcheck() -> &'static str {
     "imok"
 }
 
-#[get("/search?<args>")]
-fn search(args: String) -> Redirect {
-    let (cmd, argv, wholecmdstr) = common::validate(&args);
+#[get("/search/<args>")]
+fn search(args: &str) -> Redirect {
+    let (cmd, argv, wholecmdstr) = common::validate(args);
+    print!("Command is {}", cmd);
     if let Ok(e) = cmd.parse::<HopType>() {
         e.to_redirect(argv)
     } else {
