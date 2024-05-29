@@ -1,0 +1,29 @@
+[tasks.format]
+install_crate = "rustfmt"
+command = "cargo"
+args = ['fmt', '--', '--emit=files']
+
+[tasks.clean]
+command = "cargo"
+args = ["clean"]
+dependencies = ["format"]
+
+[tasks.build]
+command = "cargo"
+args = ["build"]
+dependencies = ["clean"]
+
+[tasks.test]
+command = "cargo"
+args = ["test"]
+dependencies = ["build"]
+
+
+
+[tasks.my-flow]
+dependencies = [
+    "format",
+    "clean",
+    "build",
+    "test"
+]

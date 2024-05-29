@@ -1,0 +1,71 @@
+#!/usr/bin/env groovy
+@Library("pipeline@release/2.x") _
+
+/**
+ * This file tells Pipeline Jenkins how to build and deploy the project.
+ * See https://wiki.indeed.com/display/PIPELINE/The+Jenkinsfile for details.
+ */
+
+script = this
+
+bootstrap(script) {
+    gitConfig.gitUrl = "git@code.corp.indeed.com:sre/lolbunny.git"
+    gitConfig.gitBranch = "master"
+
+    jiraConfig.jiraProjectKey = "SRE"
+    jiraConfig.enableJiraActions = false
+
+    buildConfig.deployablePath = "dist/lolbunny.tar.gz"
+    config.newBuildAvailableEmailList = "pwhite@indeed.com"
+    config.failureEmailList = config.newBuildAvailableEmailList
+    config.productGroup = "sre"
+    config.buildInDocker = true
+
+    config.currentVersionUrlList = []
+    config.versionCheckRetries = 10
+    config.versionCheckSleepIntervalSeconds = 15
+
+    config.healthCheckUrlList = []
+    config.healthCheckRetries = 10
+    config.healthCheckSleepIntervalSeconds = 5
+
+    config.currentProdVersionUrlList = []
+
+    config.requireVerificationInstructions = false
+
+    // Set true to enable Slack notifications
+    slackConfig.enable = false
+    slackConfig.channel = "#nothingtoseehere"
+
+    config.nodeName = "indeed-go-medium"
+}
+
+buildPipeline(script) {
+
+    createDeployable(script) {
+        sshagent(["gitlab_jenkins_ssh"]) {
+            sh "/usr/local/bin/container-startup-without-sleep"
+            sh "bash -c '" +
+                "rm -rf ./jenkies; " +
+                "git clone git@code.corp.indeed.com:rust/jenkins.git jenkies; " +
+                "chmod +x ./jenkies/*.sh;" +
+                "./jenkies/build.sh; " +
+                "'"
+        }
+    }
+
+    deployToQa(script) {
+        uploadToArc(script)
+    }
+
+    // checkQaVersion(script)
+
+    // checkQaHealthCheck(script)
+
+
+    approveDeploy(deployEnv: "PROD", alwaysDoUserInput: true, script)
+
+    deployToProd(script) {
+        changeArcLabel(script)
+    }
+}

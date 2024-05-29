@@ -1,0 +1,11 @@
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/"
+                       xmlns:moz="http://www.mozilla.org/2006/browser/search/">
+  <ShortName>lol</ShortName>
+  <Description>lolbunny - Indeed's premier overengineered shortcut service</Description>
+  <InputEncoding>UTF-8</InputEncoding>
+  <Url type="text/html" template="https://lolbunny.sandbox.indeed.net/search">
+    <Param name="args" value="{searchTerms}"/>
+  </Url>
+  <!-- <Url type="application/x-suggestions+json" template="[suggestionURL]"/> -->
+  <!-- <moz:SearchForm>[https://example.com/search]</moz:SearchForm> -->
+</OpenSearchDescription>
